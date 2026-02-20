@@ -1,6 +1,7 @@
 from exts import db
 
-class Recipe:
+
+class Recipe(db.Model):
     id = db.Column(db.Integer(), primary_key = True)
     title = db.Column(db.String(), nullable = False)
     description =  db.Column(db.Text(), nullable = False)
