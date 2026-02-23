@@ -13,10 +13,9 @@ class Recipe(db.Model):
         db.session.commit()
 
     def delete(self):
-        db.session.add(self)
+        db.session.delete(self)
         db.session.commit()
     def update(self, title, description):
         self.title=title
         self.description=description
-        db.session.update(self)
         db.session.commit()

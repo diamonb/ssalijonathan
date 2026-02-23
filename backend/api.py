@@ -42,14 +42,20 @@ class RecipesRessource(Resource):
         new_recipe.save()
         return new_recipe,201
     
-@api.route('/recipe/{<int:id>}')
+@api.route('/recipe/<int:id>')
 class RecipeRessource(Resource):
-    def update(self,id):
-        """ Get all recipes """
-        pass
-    def delete(self,id):
-        """ Post recipe """
-        pass
+    @api.marshal_list_with(Recipe_model)
+    def get(self,id):
+        """"Get a recipe"""
+        recipe = Recipe.query.get_or_404(id)
+        return recipe
+    def put(self,id):
+        """"Update a recipe"""        
+        recipe_to_update = Recipe.query.get_or_404(id)
+        data = request.get_json()
+        recipe_to_update.update(data.get('title'),data.get('description'))
+        return recipe_to_update
+    
 
 
 @app.shell_context_processor
