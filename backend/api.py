@@ -1,8 +1,10 @@
-from flask import Flask,request
+from flask import Flask,request,jsonify
 from flask_restx import Api,Resource,fields
 from config import DevConfig
 from model import Recipe
 from exts import db
+import json
+from flask_migrate import Migrate
 
 
 
@@ -11,6 +13,7 @@ app.config.from_object(DevConfig)
 api = Api(app,doc='/docs')
 db.init_app(app)
 
+migrate = Migrate(app,db)
 #model serialize
 Recipe_model = api.model("Recipe",
                          {
@@ -49,6 +52,7 @@ class RecipeRessource(Resource):
         """"Get a recipe"""
         recipe = Recipe.query.get_or_404(id)
         return recipe
+    @api.marshal_list_with(Recipe_model)    
     def put(self,id):
         """"Update a recipe"""        
         recipe_to_update = Recipe.query.get_or_404(id)
@@ -56,15 +60,18 @@ class RecipeRessource(Resource):
         recipe_to_update.update(data.get('title'),data.get('description'))
         return recipe_to_update
     
-
-
-@app.shell_context_processor
-def make_shell_context():
-    return {
-        'db': db,
-        'Recipe': Recipe
-    }
-
+    @api.marshal_list_with(Recipe_model)    
+    def delete(self,id):
+        """"Delete a recipe"""        
+        recipe_to_delete = Recipe.query.get_or_404(id)
+        recipe_to_delete.delete()
+        return recipe_to_delete
+    
+# @app.route('/reciperr/<int:id>')
+# def getRecipe(id):
+#     """"Get a recipe"""
+#     recipe = Recipe.query.get_or_404(id)
+#     return json.dumps(recipe.to_dict())
     
 if __name__ == '__main__':
     app.run()
